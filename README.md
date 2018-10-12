@@ -8,3 +8,6 @@ Team: Unemployed Angus
 
 Morgan Stanley's Challenge
 https://github.com/NickMcCrea/MSTanks
+
+Installing npm (version 10.12.0)
+https://nodejs.org/en/
