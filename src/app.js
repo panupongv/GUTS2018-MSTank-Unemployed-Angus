@@ -36,7 +36,6 @@ const commands =
     successfulHit: 28
 }
 
-
 class SocketManager
 {
     constructor(hostname,port)
@@ -95,10 +94,4 @@ class SocketManager
         this.client.write(uia);
         this.client.write(utf8.encode(cmd));
     }
-
-
 }
-
-
-//var sam = new SocketManager('127.0.0.1',8052
-export default SocketManager;
