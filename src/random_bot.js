@@ -281,11 +281,12 @@ class TankBrain {
     }
 
     action_fire_nearest_enemy() {
-        // get nearest enemy
+        var nearestEnemy = this.calculator.findNearestByType("tank");
 
-        //if not looking at the enemy
-            //look to it
-            //return
+        if(nearestEnemy == null) {
+            this.action_look_at(nearestEnemy.x, nearestEnemy.y)
+            return;
+        }
 
         this.socket.fire()
     }
@@ -297,6 +298,9 @@ class TankBrain {
         socket.turnTurretToHeading(degree);
     }
 
+    action_go_to(x,y) {
+        //todo 17chuchu
+    }
     // async loop() {
     //     while(true){
 
