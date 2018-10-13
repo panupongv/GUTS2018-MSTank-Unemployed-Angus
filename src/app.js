@@ -60,7 +60,13 @@ class SocketManager
         // this.client.connect(port, hostname, this.testConnection);
 
         this.client.on('data', function(data) {
-            console.log('Received: ' + data);
+            var rawString = data.toString();
+            var jsonString = rawString.slice(2, rawString.length-2);
+            var type = rawString.slice(0,1).charCodeAt(0);
+            var jsonObj = JSON.parse(jsonString);
+
+            //todo tank.think(type,jsonObj);
+
         });
 
         this.client.on('close', function() {
@@ -95,3 +101,5 @@ class SocketManager
         this.client.write(utf8.encode(cmd));
     }
 }
+
+var socket = new SocketManager('127.0.0.1', 8052);
