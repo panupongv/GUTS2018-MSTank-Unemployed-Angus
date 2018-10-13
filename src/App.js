@@ -1,42 +1,72 @@
-SocketIOClient = require('socket.io-client')
+var net = require('net');
+const utf8 = require('utf8');
 
-
-class Sample
+const commands =
 {
-    constructor(host,port){
-        console.log('Attempt to connect to http://' + host + ':' + port)
-        var socket = SocketIOClient('http://' + host + ':' + port)
+    test: 0,
+    createTank: 1,
+    despawnTank: 2,
+    fire: 3,
+    toggleForward: 4,
+    toggleReverse:  5,
+    toggleLeft: 6,
+    toggleRight: 7,
+    toggleTurretLeft: 8,
+    toggleTurretRight: 9,
+    turnTurretToHeading: 10,
+    turnToHeading: 11,
+    moveForwardDistance: 12,
+    moveBackwardsDistance: 13,
+    stopAll: 14,
+    stopTurn: 15,
+    stopMove: 16,
+    stopTurret: 17,
 
-        socket.on('connect', function(){
-            console.log('Successfully connected to http://' + host + ':' + 'port')
-        });
-
-        socket.on('disconnect', function(){
-            console.log('Disconnected from http://' + host + ':' + 'port')
-        });
-
-        this.socket = socket
-    }
-
-    sendMessage(typeByte, string)
-    {
-
-        var bufArray = new ArrayBuffer(2);
-        var bufView = new Uint8Array(bufArray);
-        bufView[0] = 1;
-        bufView[1] = "{'Name':'Hahaha'}";
-
-        console.log(bufArray);
-        console.log(bufArray.length);
-        console.log();
-        console.log(bufView);
-        console.log(bufView.length);
-        console.log();
-
-        this.socket.emit("message",)
-    }
+    // Server to Clients
+    objectUpdate: 18,
+    healthPickup: 19,
+    ammoPickup: 20,
+    snitchPickup: 21,
+    destroyed: 22,
+    enteredGoal: 23,
+    kill: 24,
+    snitchAppeared: 25,
+    gameTimeUpdate: 26,
+    hitDetected: 27,
+    successfulHit: 28
 }
 
 
-var sam = new Sample('127.0.0.1','8052')
-sam.sendMessage()
+class SocketManager
+{
+    constructor(hostname,port)
+    {
+        console.log("Attempt to connect to http://" + hostname + ":" + port)
+        this.client = new net.Socket();
+        this.client.connect(port, hostname, function()
+        {
+            console.log('Successfully connected to http://' + hostname + ':' + port);
+        });
+
+        this.client.on('data', function(data) {
+            console.log('Received: ' + data);
+        });
+
+        this.client.on('close', function() {
+            console.log('Disconnected from http://' + hostname + ':' + port);
+
+        });
+    }
+
+    testConnection()
+    {
+        var uia = new Uint8Array([0, 0]);
+        this.client.write(uia);
+    }
+
+
+}
+
+
+var sam = new SocketManager('127.0.0.1',8052)
+sam.testConnection()
