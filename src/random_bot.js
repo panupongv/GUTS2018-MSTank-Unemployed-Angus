@@ -300,6 +300,24 @@ class TankBrain {
 
     action_go_to(x,y) {
         //todo 17chuchu
+        var myX = this.calculator.currentX();
+        var myY = this.calculator.currentY();
+        var degree = this.calculator.degreeBetween(x, y, myX, myY);
+        if(degree > -0.01 && degree < 0.01)
+        {
+            socket.turnToHeading(degree);
+            return
+        }
+
+        var distance = Math.sqrt((x - y)**2 + (myX - myY)**2)
+        if(distance > -5 && distance < 5)
+        {
+            socket.moveForward(1000);
+            return
+        }
+
+        socket.stopAll();
+
     }
     // async loop() {
     //     while(true){
