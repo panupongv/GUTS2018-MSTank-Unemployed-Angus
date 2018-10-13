@@ -41,12 +41,24 @@ class SocketManager
 {
     constructor(hostname,port)
     {
+        this.hostname = hostname
+        this.port = port
+
         console.log("Attempt to connect to http://" + hostname + ":" + port)
         this.client = new net.Socket();
-        this.client.connect(port, hostname, function()
-        {
-            console.log('Successfully connected to http://' + hostname + ':' + port);
+
+        var ref = this
+        this.client.connect(port, hostname, ()=>{
+            console.log('Successfully connected to http://' + ref.hostname + ':' + ref.port);
+
+            var cmd = '{"Name":"UnemployedAngus"}';
+            var uia = new Uint8Array([1, cmd.length+1]);
+            ref.client.write(uia);
+            ref.client.write(utf8.encode(cmd));
+
+            ref.moveForward(1000)
         });
+        // this.client.connect(port, hostname, this.testConnection);
 
         this.client.on('data', function(data) {
             console.log('Received: ' + data);
@@ -58,10 +70,12 @@ class SocketManager
         });
     }
 
-    testConnection()
+    moveForward(amount)
     {
-        var uia = new Uint8Array([0, 0]);
+        var cmd = '{ "Amount" : ' + amount + ' }';
+        var uia = new Uint8Array([4, cmd.length+1]);
         this.client.write(uia);
+        this.client.write(utf8.encode(cmd));
     }
 
 
@@ -69,4 +83,4 @@ class SocketManager
 
 
 var sam = new SocketManager('127.0.0.1',8052)
-sam.testConnection()
+
