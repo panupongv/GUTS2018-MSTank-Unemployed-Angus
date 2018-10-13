@@ -73,14 +73,19 @@ class Calculator {
         return this.mainTank.data.ammo >= 3
     }
 
+    distance(x1,x2,y1,y2){
+        var dis = Math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
+        return dis
+    }
+
     findNearestByType(type){
         var obj = null
         var nearest = 10000000000
         switch(type){
-            case Tank : {
+            case "tank" : {
                 var min = null
                 for( var i=0; i< this.otherTanks.length; i++){
-                    min = Math.sqrt((this.otherTanks[i].x - this.mainTank.x)**2 + (this.otherTanks[i].y - this.mainTank.y)**2)
+                    min = this.distance(this.otherTanks[i].x,this.mainTank.x,this.otherTanks[i].y,this.mainTank.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.otherTanks[i]
@@ -88,10 +93,10 @@ class Calculator {
                 }
                 break;
             }
-            case healthPickup : {
+            case "healthPickup" : {
                 var min = null
                 for( var i=0; i< this.healthPickups.length; i++){
-                    min = Math.sqrt((this.healthPickups[i].x - this.mainTank.x)**2 + (this.healthPickups[i].y - this.mainTank.y)**2)
+                    min = this.distance(this.healthPickups[i].x,this.mainTank.x,this.healthPickups[i].y,this.mainTank.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.healthPickups[i]
@@ -99,10 +104,10 @@ class Calculator {
                 }
                 break;
             }
-            case ammoPickup : {
+            case "ammoPickup" : {
                 var min = null
                 for( var i=0; i< this.ammoPickups.length; i++){
-                    min = Math.sqrt((this.ammoPickups[i].x - this.mainTank.x)**2 + (this.ammoPickups[i].y - this.mainTank.y)**2)
+                    min = this.distance(this.ammoPickups[i].x,this.mainTank.x,this.ammoPickups[i].y,this.mainTank.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.ammoPickups[i]
