@@ -60,6 +60,12 @@ class TankData {
     }
 }
 
+class Calculator {
+    constructor(mainTank){
+        this.mainTank = mainTank
+    }
+}
+
 class TankBrain {
     constructor(name, socket) {
         console.log('construst started')
@@ -71,8 +77,11 @@ class TankBrain {
         this.snitchHolder = null;
 
         this.otherTanks = []
+        this.healthPickups = []
+        this.ammoPickups = []
 
         this.state = ST_JUSTWALK;
+        this.calculator = new Calculator(this)
 
         // this.loop().then(r => null)
         // await this.loop()
