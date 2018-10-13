@@ -113,6 +113,25 @@ class Calculator {
         }
         return obj
     }
+
+    currentX(){
+        return this.mainTank.data.x
+    }
+
+    currentY(){
+        return this.mainTank.data.y
+    }
+
+    degreeBetween(fx,fy,tx,ty){
+        var dx = tx-fx;
+        var dy = ty - fy;
+        // angle in radians
+        var angleRadians = Math.atan2(dy, dx);
+
+        // angle in degrees
+        var angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+        return angleDeg
+    }
 }
 
 class TankBrain {
@@ -130,10 +149,8 @@ class TankBrain {
         this.ammoPickups = []
 
         this.state = ST_JUSTWALK;
-        this.calculator = new Calculator(this)
+        this.calculator = new Calculator(this);
 
-        // this.loop().then(r => null)
-        // await this.loop()
         console.log('construct ended')
     }
 
@@ -260,8 +277,26 @@ class TankBrain {
     }
 
     perform(){
-        this.socket.fire();
+
     }
+
+    action_fire_nearest_enemy() {
+        // get nearest enemy
+
+        //if not looking at the enemy
+            //look to it
+            //return
+
+        this.socket.fire()
+    }
+
+    action_look_at(x,y) {
+        var myX = this.calculator.currentX();
+        var myY = this.calculator.currentY();
+        var degree = this.calculator.degreeBetween(x, y, myX, myY);
+        socket.turnTurretToHeading(degree);
+    }
+
     // async loop() {
     //     while(true){
 

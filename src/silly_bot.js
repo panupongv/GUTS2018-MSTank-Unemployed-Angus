@@ -81,7 +81,6 @@ class TankBrain {
                     //tbc
                 }
 
-
                 break;
             } 
 
