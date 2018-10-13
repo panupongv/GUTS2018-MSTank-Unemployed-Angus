@@ -35,7 +35,10 @@ const GAMETIMEUPDATE = 26
 const HITDETECTED = 27
 const SUCCESSFULLHIT = 28
 
-const ST_JUSTWALK = 100;
+const STATE_GOING_TO = 100;
+const STATE_FIRING_TO = 101;
+const TSTATE_SEARCH = 200;
+const TSTATE_FOLLOW = 201;
 
 const topBound = 70;
 const bottomBound = -70;
@@ -154,8 +157,19 @@ class TankBrain {
         this.ammoPickups = []
 
         this.state = ST_JUSTWALK;
-        this.calculator = new Calculator(this);
+        this.tState = TSTATE_SEARCH;
 
+        this.turretFollowing = null;
+
+        this.turningLeft = false;
+        this.turningRight = false;
+
+        this.calculator = new Calculator(this)
+
+        this.killStack = 0;
+
+        // this.loop().then(r => null)
+        // await this.loop()
         console.log('construct ended')
     }
 
@@ -206,6 +220,9 @@ class TankBrain {
                 // Case enemy
                 else if( actionParams["Type"] == "Tank"){
                     updateEnemyTankData(actionParams)
+                    if (this.tState == TSTATE_SEARCH) {
+                        this.tState = TSTATE_FOLLOW;
+                    }
                 }
                 // Case Bonus : pickups
                 else if( actionParams["Type"] == "HealthPickup"){
@@ -252,7 +269,7 @@ class TankBrain {
                 break;
             }
 
-            case  KILL: {
+            case KILL: {
                 break;
             }
 
@@ -282,7 +299,19 @@ class TankBrain {
     }
 
     perform(){
-
+        switch(this.tState) {
+            case TSTATE_SEARCH: {
+                if (!this.turningLeft) {
+                    this.socket.toggleTurretLeft();
+                    this.turretFollowing = this.findTankById(actionParams["Id"]);
+                }
+                break;
+            }
+            case TSTATE_FOLLOW: {
+                this.socket.turnToHeading();
+                break;
+            }
+        }
     }
 
     action_fire_nearest_enemy() {
