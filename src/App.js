@@ -57,6 +57,7 @@ class SocketManager
             ref.client.write(utf8.encode(cmd));
 
             ref.moveForward(1000)
+            //ref.toggleLeft()
         });
         // this.client.connect(port, hostname, this.testConnection);
 
@@ -68,6 +69,14 @@ class SocketManager
             console.log('Disconnected from http://' + hostname + ':' + port);
 
         });
+    }
+
+    toggleLeft()
+    {
+        var cmd = ' ';
+        var uia = new Uint8Array([6, 1]);
+        this.client.write(uia);
+        this.client.write(utf8.encode(''));
     }
 
     moveForward(amount)
@@ -83,4 +92,4 @@ class SocketManager
 
 
 var sam = new SocketManager('127.0.0.1',8052)
-
+sam.moveForward(3000)
