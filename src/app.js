@@ -56,8 +56,7 @@ class SocketManager
             ref.client.write(uia);
             ref.client.write(utf8.encode(cmd));
 
-            ref.moveForward(1000)
-            //ref.toggleLeft()
+             // Do some thing my nibb
         });
         // this.client.connect(port, hostname, this.testConnection);
 
@@ -71,12 +70,22 @@ class SocketManager
         });
     }
 
-    toggleLeft()
+    toggleTurnLeft()
     {
-        var cmd = ' ';
-        var uia = new Uint8Array([6, 1]);
+        var uia = new Uint8Array([6, 0]);
         this.client.write(uia);
-        this.client.write(utf8.encode(''));
+    }
+
+    toggleTurnRight()
+    {
+        var uia = new Uint8Array([7, 0]);
+        this.client.write(uia);
+    }
+
+    fire()
+    {
+        var uia = new Uint8Array([3, 0]);
+        this.client.write(uia);             
     }
 
     moveForward(amount)
@@ -91,5 +100,5 @@ class SocketManager
 }
 
 
-var sam = new SocketManager('127.0.0.1',8052)
-sam.moveForward(3000)
+//var sam = new SocketManager('127.0.0.1',8052
+export default SocketManager;
