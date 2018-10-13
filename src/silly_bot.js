@@ -33,7 +33,6 @@ const GAMETIMEUPDATE = 26
 const HITDETECTED = 27
 const SUCCESSFULLHIT = 28
 
-
 class TankBrain {
     constructor(name) {
         this.name = name;
