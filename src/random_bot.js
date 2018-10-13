@@ -74,12 +74,6 @@ class SocketManager
         this.client.write(uia);
     }
 
-    toggleTurnRight()
-    {
-        var uia = new Uint8Array([7, 0]);
-        this.client.write(uia);
-    }
-
     fire()
     {
         var uia = new Uint8Array([3, 0]);
@@ -89,9 +83,20 @@ class SocketManager
     moveForward(amount)
     {
         var cmd = '{ "Amount" : ' + amount + ' }';
-        var uia = new Uint8Array([4, cmd.length+1]);
+        var uia = new Uint8Array([12, cmd.length+1]);
         this.client.write(uia);
         this.client.write(utf8.encode(cmd));
+    }
+
+    toggleTurnRight()
+    {
+        var uia = new Uint8Array([7, 0]);
+        this.client.write(uia);
+    }
+
+    toggleForward() {
+        var uia = new Uint8Array([4, 0]);
+        this.client.write(uia);
     }
 }
 
