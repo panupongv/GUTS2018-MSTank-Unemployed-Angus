@@ -301,6 +301,21 @@ class TankBrain {
     action_go_to(x,y) {
         //todo 17chuchu
     }
+
+    action_go_to_left_bank(){
+        //todo 17chuchu
+    }
+
+    action_go_to_right_bank(){
+        //todo 17chuchu
+    }
+
+    action_go_to_nearest_bank(){
+        //todo 17chuchu
+    }
+
+    //guide = https://github.com/NickMcCrea/MSTanks/wiki/Arena-Layout-and-Useful-Coordinates
+
     // async loop() {
     //     while(true){
 
