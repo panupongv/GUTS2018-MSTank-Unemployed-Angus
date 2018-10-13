@@ -64,6 +64,55 @@ class Calculator {
     constructor(mainTank){
         this.mainTank = mainTank
     }
+
+    enoughHealth(){
+        return this.mainTank.data.health >= 3
+    }
+
+    enoughAmmo(ammo){
+        return this.mainTank.data.ammo >= 3
+    }
+
+    findNearestByType(type){
+        var obj = null
+        var nearest = 10000000000
+        switch(type){
+            case Tank : {
+                var min = null
+                for( var i=0; i< this.otherTanks.length; i++){
+                    min = Math.sqrt((this.otherTanks[i].x - this.mainTank.x)**2 + (this.otherTanks[i].y - this.mainTank.y)**2)
+                    if ( min < nearest ){
+                        nearest = min
+                        obj = this.otherTanks[i]
+                    }
+                }
+                break;
+            }
+            case healthPickup : {
+                var min = null
+                for( var i=0; i< this.healthPickups.length; i++){
+                    min = Math.sqrt((this.healthPickups[i].x - this.mainTank.x)**2 + (this.healthPickups[i].y - this.mainTank.y)**2)
+                    if ( min < nearest ){
+                        nearest = min
+                        obj = this.healthPickups[i]
+                    }
+                }
+                break;
+            }
+            case ammoPickup : {
+                var min = null
+                for( var i=0; i< this.ammoPickups.length; i++){
+                    min = Math.sqrt((this.ammoPickups[i].x - this.mainTank.x)**2 + (this.ammoPickups[i].y - this.mainTank.y)**2)
+                    if ( min < nearest ){
+                        nearest = min
+                        obj = this.ammoPickups[i]
+                    }
+                }
+                break;
+            }
+        }
+        return obj
+    }
 }
 
 class TankBrain {
