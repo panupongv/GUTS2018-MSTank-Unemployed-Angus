@@ -60,6 +60,11 @@ class TankData {
         this.turretHeading = actionParams["TurretHeading"];
         this.health = actionParams["Health"];
         this.ammo = actionParams["Ammo"];
+        this.updateTime = Date.now();
+    }
+
+    isOutDate(){
+        return (Date.now() - this.updateTime) >= 500;
     }
 }
 
@@ -196,6 +201,10 @@ class TankBrain {
         }
     }
 
+    removeOutDateData() {
+        this.otherTanks = this.otherTanks.filter((a) => a.isOutDate());
+    }
+
     fetchEnvironmentData(actionType, actionParams){
         switch(actionType) {
             case OBJECTUPDATE: {
@@ -215,6 +224,7 @@ class TankBrain {
                 // Case self
                 if( this.name == actionParams["Name"]){
                     this.updateSelfTankData(actionParams);
+                    this.removeOutDateData();
                     this.perform();
                 }
                 // Case enemy
