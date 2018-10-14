@@ -127,6 +127,19 @@ class TankBrain {
                         // var enemy = this.findTankById(actionParams["Id"]);
                         // this.turretFollowing = new Point(enemy.x, enemy.y);
                     // }
+
+                    //shooting decision
+                        var enemy = new TankData(actionParams)// this.otherTanks[i];
+                        var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
+                        var distance = this.calculator.distanceTo(enemy.x, enemy.y);
+                        if(difDegree <= 10 && distance <= 60) {
+                            this.socket.stopTurret();
+                            this.socket.fire();
+                            console.log("FIRE LA SAS")
+                            break;
+                        }
+
+
                 }
                 // Case Bonus : pickups
                 else if( actionParams["Type"] == "HealthPickup") {
@@ -199,7 +212,8 @@ class TankBrain {
             } 
 
             case HEALTHPICKUP: {
-                // Update wa pick health laew
+                this.mState = STATE_SCOUT;
+                this.trackedPickup = null;
                 break;
             }
 
@@ -260,24 +274,13 @@ class TankBrain {
     }
 
     perform() {
-        //shooting decision
-        var triggered = false
-        for(var i = 0 ; i < this.otherTanks.length ; i++){
-            var enemy = this.otherTanks[i];
-            var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
-            var distance = this.calculator.distanceTo(enemy.x, enemy.y);
-            if(difDegree <= 5 && distance <= 50) {
-                triggered = true
-                break;
-            }
-        }
 
-        if(triggered) {
-            this.socket.fire();
+        // if(triggered) {
+        //     this.socket.fire();
             // this.socket.fire();
             // this.socket.fire();
-            console.log("FIRE");
-        }
+            // console.log("FIRE");
+        // }
 
         // console.log(Date.now()/1000);
         // this.action_go_to_nearest_bank()
@@ -332,6 +335,7 @@ class TankBrain {
                 // this.socket.turnTurretToHeading(this.data.heading + 45)
                 break;
             }
+
             case TSTATE_FOLLOW: {
                 var degree = this.calculator.degreeBetween(this.data.x, this.data.y, this.turretFollowing.x, this.turretFollowing.y)
                 this.socket.turnTurretToHeading(degree);
@@ -432,7 +436,7 @@ class TankBrain {
         if(distance <= 3){
             this.currentCoverPoint += 1;
             this.currentCoverPoint %= this.moveAroundRoute.length
-            this.moveAround();
+            // this.moveAround();
             return;
         }
 

@@ -89,7 +89,7 @@ class Calculator {
         return angleDeg
     }
 
-    squarePath(x, y, width=40) {
+    squarePath(x, y, width=2) {
         // var ar =  [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
 
         var ar =  [[x-width/2,y-width/2],[x-width/2,y+width/2],[x+width/2,y+width/2],[x+width/2,y-width/2]];
