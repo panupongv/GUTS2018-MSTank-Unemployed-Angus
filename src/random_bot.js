@@ -356,53 +356,46 @@ class TankBrain {
         this.socket.fire()
     }
 
-    action_look_at(x,y) {
-        var myX = this.calculator.currentX();
-        var myY = this.calculator.currentY();
-        var degree = this.calculator.degreeBetween(x, y, myX, myY);
-        socket.turnTurretToHeading(degree);
-    }
-
     action_go_to(x,y) {
-        //todo 17chuchu
         var myX = this.calculator.currentX();
         var myY = this.calculator.currentY();
-        var degree = this.calculator.degreeBetween(x, y, myX, myY);
-        if(degree > -0.01 && degree < 0.01)
+        var distance = this.calculator.distance(x, myX, y, myY);
+        if(distance <= 5)
         {
-            socket.turnToHeading(degree);
+            this.socket.stopAll();
+            return;
+        }
+
+        var degree = this.calculator.degreeBetween(myX, myY, x, y);
+        var difDegree = Math.abs(degree - this.data.heading);
+
+        console.log(myX + '-' + myY);
+        console.log(difDegree);
+
+        if(difDegree > 1)// > -0.01 && degree < 0.01)
+        {
+            this.socket.turnToHeading(degree);
             return
         }
 
-        var distance = Math.sqrt((x - y)**2 + (myX - myY)**2)
-        if(distance > -2 && distance < 2)
-        {
-            socket.moveForward(1000);
-            return
-        }
-
-        socket.stopMove();
-
+        this.socket.moveForward(10);
     }
 
     action_go_to_left_bank(){
-        this.action_go_to(100,0)
+        this.action_go_to(0, 105)
     }
 
     action_go_to_right_bank(){
-        this.action_go_to(-100,0)
+        this.action_go_to(0, -105)
     }
 
     action_go_to_nearest_bank(){
-        var distBankLeft = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),100,0)
-        var distBankRight = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),-100,0)
-        
-        if(distBankLeft > distBankRight)
-        {
-            this.action_go_to_right_bank()
-            return 
+        if (this.data.y >= 0) {
+
+            this.action_go_to_left_bank();
+        } else {
+            this.action_go_to_right_bank();
         }
-        this.action_go_to_left_bank()
     }
 
     action_pick_up_health(x,y){
