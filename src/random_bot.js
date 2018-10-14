@@ -73,6 +73,12 @@ class Calculator {
         this.mainTank = mainTank
     }
 
+    closeToHealthPickup(){
+        //waring : may not check all 360 degree
+        var h = this.findNearestByType("healthPickup")
+        return this.distance(this.mainTank.data.x,h.x,this.mainTank.data.y,h.y) < 30
+    }
+
     shouldTakeHealth(){
         return (this.mainTank.data.health < 2 || this.mainTank.data.ammo <= 5 || this.mainTank.killStack >=  2)
     }
@@ -381,24 +387,26 @@ class TankBrain {
 
     action_go_to_left_bank(){
         this.action_go_to(100,0)
-        //todo 17chuchu
     }
 
     action_go_to_right_bank(){
         this.action_go_to(-100,0)
-        //todo 17chuchu
     }
 
     action_go_to_nearest_bank(){
         var distBankLeft = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),100,0)
         var distBankRight = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),-100,0)
-        //todo 17chuchu
+        
         if(distBankLeft > distBankRight)
         {
             this.action_go_to_right_bank()
             return 
         }
         this.action_go_to_left_bank()
+    }
+
+    action_pick_up_health(x,y){
+        this.action_go_to(x,y)
     }
 
     //guide = https://github.com/NickMcCrea/MSTanks/wiki/Arena-Layout-and-Useful-Coordinates
