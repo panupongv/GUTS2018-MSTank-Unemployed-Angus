@@ -344,13 +344,13 @@ class TankBrain {
         }
 
         var distance = Math.sqrt((x - y)**2 + (myX - myY)**2)
-        if(distance > -5 && distance < 5)
+        if(distance > -2 && distance < 2)
         {
             socket.moveForward(1000);
             return
         }
 
-        socket.stopAll();
+        socket.stopMove();
 
     }
 
@@ -365,8 +365,15 @@ class TankBrain {
     }
 
     action_go_to_nearest_bank(){
-        
+        var distBankLeft = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),100,0)
+        var distBankRight = this.calculator.degreeBetween(this.calculator.currentX(),this.calculator.currentY(),-100,0)
         //todo 17chuchu
+        if(distBankLeft > distBankRight)
+        {
+            this.action_go_to_right_bank()
+            return 
+        }
+        this.action_go_to_left_bank()
     }
 
     //guide = https://github.com/NickMcCrea/MSTanks/wiki/Arena-Layout-and-Useful-Coordinates
