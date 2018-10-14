@@ -164,24 +164,16 @@ class TankBrain {
         this.data = null;
         this.gameTime = null;
         this.snitchHolder = null;
-
         this.otherTanks = []
-        this.healthPickups = []
-        this.ammoPickups = []
 
         this.tState = TSTATE_SEARCH;
 
         this.turretFollowing = null;
 
-        this.turningLeft = false;
-        this.turningRight = false;
-
-        this.calculator = new Calculator(this)
+        this.calculator = new Calculator(this);
 
         this.killStack = 0;
 
-        // this.loop().then(r => null)
-        // await this.loop()
         console.log('construct ended')
     }
 
@@ -285,11 +277,12 @@ class TankBrain {
             }
 
             case ENTEREDGOAL: {
-                // Update state
+                this.killStack = 0;
                 break;
             }
 
             case KILL: {
+                this.killStack += 1;
                 break;
             }
 
