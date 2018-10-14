@@ -145,6 +145,11 @@ class Calculator {
         var angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
         return angleDeg
     }
+
+    getSquarePath(x,y,width)
+    {
+        return [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+    }
 }
 
 class TankBrain {
