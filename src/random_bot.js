@@ -47,20 +47,22 @@ class TankBrain {
         this.moveAroundRoute = [[-20,-50],[-20,50],[20,50],[20,-50]]
         this.currentCoverPoint = 0;
 
+        this.calculator = new Calculator(this);
+
+        this.resetState();
+
+        console.log('construct ended')
+    }
+
+    resetState() {
         this.mState = STATE_SCOUT;
         this.tState = TSTATE_SEARCH;
 
         this.going_to = false;
         this.turretFollowing = null;//new Point(x,y)
         this.trackedPickup = null;
-        // this.trackedRect = null;
-        this.rectIndex = 0;
-
-        this.calculator = new Calculator(this);
 
         this.killStack = 0;
-
-        console.log('construct ended')
     }
 
     hasFoundTank(id) {
@@ -111,8 +113,8 @@ class TankBrain {
                     this.updateSelfTankData(actionParams);
                     this.removeOutDateData();
 
-                    if(this.removeOutDatePickup())
-                        this.mState = STATE_SCOUT;
+                    // if(this.removeOutDatePickup())
+                    //     this.mState = STATE_SCOUT;
 
                     this.perform();
                 }
@@ -129,13 +131,12 @@ class TankBrain {
                     // }
 
                     //shooting decision
-                        var enemy = new TankData(actionParams)// this.otherTanks[i];
+                        var enemy = new TankData(actionParams);// this.otherTanks[i];
                         var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
                         var distance = this.calculator.distanceTo(enemy.x, enemy.y);
                         if(difDegree <= 10 && distance <= 60) {
-                            this.socket.stopTurret();
-                            this.socket.fire();
-                            console.log("FIRE LA SAS")
+                            this.turretFollowing = enemy;
+                            this.tState = TSTATE_FOLLOW;
                             break;
                         }
 
@@ -145,44 +146,36 @@ class TankBrain {
                 else if( actionParams["Type"] == "HealthPickup") {
                     var pickup = new TankData(actionParams);
 
-                    this.mState = STATE_GUARDIAN
-                    // this.tState = TSTATE_FOLLOW;
-                    this.turretFollowing = pickup;
+                    this.mState = STATE_GET_HEAL;
+                    if(this.trackedPickup == null)
+                        this.trackedPickup = new TankData(actionParams);
 
-                    // if (this.trackedPickup != null) {
-                    //     var currentDis = this.calculator.distance(this.data.x, this.trackedPickup.x, this.data.y, this.trackedPickup.y);
-                    //     var dis = this.calculator.distance(this.data.x, pickupX, this.data.y, pickupY);
-                    //     if (dis < currentDis) {
-                    //         this.trackedPickup = new TankData(actionParams);
-                    //         this.trackedRect = this.calculator.squarePath(pickupX, pickupY, 30);
+                    // if (this.trackedPickup == null)
+                    // {
+                    //     this.trackedPickup = pickup;
+                    //     // this.trackedRect = this.calculator.squarePath(pickupX, pickupY, 30);
+                    //     this.moveAroundRoute = this.calculator.squarePath(pickup.x,pickup.y);
+                    // }
+                    // else
+                    // {
+                    //     if(this.trackedPickup.id == pickup.id)
+                    //     {
+                    //         this.trackedPickup.updateData(actionParams);
                     //     }
-                    // } else
-                    if (this.trackedPickup == null)
-                    {
-                        this.trackedPickup = pickup;
-                        // this.trackedRect = this.calculator.squarePath(pickupX, pickupY, 30);
-                        this.moveAroundRoute = this.calculator.squarePath(pickup.x,pickup.y);
-                    }
-                    else
-                    {
-                        if(this.trackedPickup.id == pickup.id)
-                        {
-                            this.trackedPickup.updateData(actionParams);
-                        }
-                        else{
-                            var currentPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
-                            var newPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
-
-                            if(newPickupDist < currentPickupDist) {
-                                this.trackedPickup = pickup;
-                                this.moveAroundRoute = this.calculator.squarePath(pickup.x, pickup.y);
-                            }
+                    //     else{
+                    //         var currentPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
+                    //         var newPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
+                    //
+                    //         if(newPickupDist < currentPickupDist) {
+                    //             this.trackedPickup = pickup;
+                    //             this.moveAroundRoute = this.calculator.squarePath(pickup.x, pickup.y);
+                    //         }
                             //     if (dis < currentDis) {
                             //         this.trackedPickup = new TankData(actionParams);
                             //         this.trackedRect = this.calculator.squarePath(pickupX, pickupY, 30);
                             //     }
-                        }
-                    }
+                    //     }
+                    // }
 
 
                     // var below = this.data.y < this.trackedPickup["Y"];
@@ -235,6 +228,7 @@ class TankBrain {
             }
 
             case DESTROYED: {
+                this.resetState();
                 break;
             }
 
@@ -295,7 +289,7 @@ class TankBrain {
             case STATE_SCOUT: {
                 this.moveAroundRoute = this.calculator.coverPath();
                 this.moveAround();
-                this.tState = TSTATE_SEARCH;
+                //this.tState = TSTATE_SEARCH;
                 break;
             }
 
@@ -322,9 +316,13 @@ class TankBrain {
                     break;
                 }
 
-                this.tState = TSTATE_FOLLOW;
+                //this.tState = TSTATE_SEARCH;
                 this.turretFollowing = this.trackedPickup;
                 this.action_go_to(this.trackedPickup.x, this.trackedPickup.y);
+                if(this.calculator.distanceTo(this.trackedPickup.x, this.trackedPickup.y) <= 2) {
+                    this.trackedPickup = null;
+                    this.mState = STATE_SCOUT;
+                }
                 break;
             }
         }
@@ -339,6 +337,7 @@ class TankBrain {
             case TSTATE_FOLLOW: {
                 var degree = this.calculator.degreeBetween(this.data.x, this.data.y, this.turretFollowing.x, this.turretFollowing.y)
                 this.socket.turnTurretToHeading(degree);
+                this.socket.fire();
                 break;
             }
         }
@@ -402,7 +401,7 @@ class TankBrain {
             return
         }
 
-        this.socket.moveForward(5);
+        this.socket.moveForward(10);
     }
 
     action_go_to_left_bank(){
@@ -430,13 +429,13 @@ class TankBrain {
         var targetPoint = this.moveAroundRoute[this.currentCoverPoint]
         var distance = this.calculator.distance(targetPoint[0], this.data.x, targetPoint[1], this.data.y)
 
-        // console.log(targetPoint)
-        // console.log('XXXX' + distance)
+        console.log(targetPoint)
+        console.log('XXXX' + distance)
 
-        if(distance <= 3){
+        if(distance <= 2){
             this.currentCoverPoint += 1;
             this.currentCoverPoint %= this.moveAroundRoute.length
-            // this.moveAround();
+            this.moveAround();
             return;
         }
 
