@@ -89,12 +89,39 @@ class Calculator {
         return angleDeg
     }
 
-    squarePath(x, y, width) {
-        return [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+    squarePath(x, y, width=40) {
+        var ar =  [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+        return this.rotateToNearestFirst(ar);
     }
 
     coverPath(){
-        return [[-20,-50],[-20,50],[20,50],[20,-50]]
+        return this.rotateToNearestFirst([[-20,-50],[-20,50],[20,50],[20,-50]]);
+    }
+
+    rotateToNearestFirst(ar)
+    {
+        var minDist = 1000
+        var minI = 0;
+        for(var i = 0 ; i < ar.length ; i++)
+        {
+            var dist = this.distance(ar[i][0],this.mainTank.data.x,ar[i][1],this.mainTank.data.y);
+            if(dist < minDist) {
+                minDist = dist;
+                minI = i;
+            }
+        }
+
+        var newAr = []
+        for(var j = 0 ; j < ar.length ; j++)
+        {
+            newAr.push(ar[(minI+j)%ar.length])
+        }
+
+        return newAr;
+    }
+
+    distanceTo(x,y){
+        return this.distance(x, this.mainTank.data.x, y, this.mainTank.data.y)
     }
 }
 

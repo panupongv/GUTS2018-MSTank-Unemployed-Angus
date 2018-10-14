@@ -17,7 +17,7 @@ class TankData {
     }
 
     isOutDate(){
-        return (Date.now() - this.updateTime) >= 500;
+        return (Date.now() - this.updateTime) >= 2000;
     }
 }
 
