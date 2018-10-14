@@ -104,7 +104,7 @@ class TankBrain {
                 // Case Bonus : pickups
                 else if( actionParams["Type"] == "HealthPickup") {
 
-                    this.tState = STILL
+                    this.tState = TSTATE_STILL;
 
                     if (this.trackedPickup != null) {
                         var currentDis = this.calculator.distance(this.data.x, this.trackedPickup.x, this.data.y, this.trackedPickup.y);
