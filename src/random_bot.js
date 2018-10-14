@@ -73,6 +73,10 @@ class Calculator {
         this.mainTank = mainTank
     }
 
+    shouldTakeHealth(){
+        return (this.mainTank.data.health < 2 || this.mainTank.data.ammo <= 5 || this.mainTank.killStack >=  2)
+    }
+
     enoughHealth(){
         return this.mainTank.data.health >= 3
     }
@@ -93,7 +97,7 @@ class Calculator {
             case "tank" : {
                 var min = null
                 for( var i=0; i< this.otherTanks.length; i++){
-                    min = this.distance(this.otherTanks[i].x,this.mainTank.x,this.otherTanks[i].y,this.mainTank.y)
+                    min = this.distance(this.otherTanks[i].x,this.mainTank.data.x,this.otherTanks[i].y,this.mainTank.data.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.otherTanks[i]
@@ -104,7 +108,7 @@ class Calculator {
             case "healthPickup" : {
                 var min = null
                 for( var i=0; i< this.healthPickups.length; i++){
-                    min = this.distance(this.healthPickups[i].x,this.mainTank.x,this.healthPickups[i].y,this.mainTank.y)
+                    min = this.distance(this.healthPickups[i].x,this.mainTank.data.x,this.healthPickups[i].y,this.mainTank.data.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.healthPickups[i]
@@ -115,7 +119,7 @@ class Calculator {
             case "ammoPickup" : {
                 var min = null
                 for( var i=0; i< this.ammoPickups.length; i++){
-                    min = this.distance(this.ammoPickups[i].x,this.mainTank.x,this.ammoPickups[i].y,this.mainTank.y)
+                    min = this.distance(this.ammoPickups[i].x,this.mainTank.data.x,this.ammoPickups[i].y,this.mainTank.data.y)
                     if ( min < nearest ){
                         nearest = min
                         obj = this.ammoPickups[i]
@@ -333,8 +337,14 @@ class TankBrain {
         var nearestEnemy = this.calculator.findNearestByType("tank");
 
         if(nearestEnemy == null) {
-            this.action_look_at(nearestEnemy.x, nearestEnemy.y)
             return;
+        } else {
+            if(Math.abs(this.calculator.degreeBetween(this.mainTank.data.x,this.mainTank.data.y,nearestEnemy.x,nearestEnemy.x) - this.data.turretHeading) < 10 ){
+                this.socket.fire()
+            } else {
+                this.action_look_at(nearestEnemy.x, nearestEnemy.y)
+            }
+            
         }
 
         this.socket.fire()
