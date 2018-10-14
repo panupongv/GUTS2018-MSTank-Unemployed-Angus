@@ -76,12 +76,12 @@ class SocketManager
             // console.log(jsonString)
 
             //version 2
-            console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
+            // console.log('xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx')
             var bytes = Uint8Array.from(data)
             var i = 0
             var rawString = data+'';
-            console.log(rawString)
-            console.log('-------------------------------')
+            // console.log(rawString)
+            // console.log('-------------------------------')
             while ( i < bytes.length )
             {
                 var type = bytes[i++];
@@ -89,12 +89,12 @@ class SocketManager
                 var jsonString = rawString.slice(i,i+len);
                 i += len;
 
-                console.log(type + ' - ' + len + ' - ' + jsonString);
+                //console.log(type + ' - ' + len + ' - ' + jsonString);
                 if(ref.tb === null)
                     continue;
                 ref.tb.think(type,JSON.parse(jsonString))
             }
-            console.log()
+            // console.log()
         });
 
         this.client.on('close', function() {
