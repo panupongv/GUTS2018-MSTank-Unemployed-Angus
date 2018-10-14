@@ -139,10 +139,13 @@ class Calculator {
         var dx = tx-fx;
         var dy = ty - fy;
         // angle in radians
-        var angleRadians = Math.atan2(dy, dx);
+        var angleRadians = Math.atan2(dx, dy);
 
         // angle in degrees
-        var angleDeg = Math.atan2(dy, dx) * 180 / Math.PI;
+        var angleDeg = Math.atan2(dx, dy) * 180 / Math.PI + 180 + 90;
+        angleDeg = angleDeg > 360 ? angleDeg - 360 : angleDeg
+        // if(angleDeg > 180)
+        //     angleDeg = -180 + (angleDeg-180)
         return angleDeg
     }
 
@@ -166,7 +169,6 @@ class TankBrain {
         this.healthPickups = []
         this.ammoPickups = []
 
-        this.state = ST_JUSTWALK;
         this.tState = TSTATE_SEARCH;
 
         this.turretFollowing = null;
@@ -184,12 +186,12 @@ class TankBrain {
     }
 
     hasFoundTank(id) {
-        filteredTanks = this.otherTanks.filter(tankData => tankData.id == id);
+        var filteredTanks = this.otherTanks.filter(tankData => tankData.id == id);
         return filteredTanks.length > 0;
     }
 
     findTankById(id) {
-        filteredTanks = this.otherTanks.filter(tankData => tankData.id == id);
+        var filteredTanks = this.otherTanks.filter(tankData => tankData.id == id);
         return filteredTanks[0];
     }
 
@@ -202,7 +204,7 @@ class TankBrain {
             this.otherTanks.push(new TankData(actionParams) )
         }
         else{
-            this.findTankById.updateData(actionParams);
+            this.findTankById(actionParams["Id"]).updateData(actionParams);
         }
     }
 
@@ -234,10 +236,13 @@ class TankBrain {
                 }
                 // Case enemy
                 else if( actionParams["Type"] == "Tank"){
-                    updateEnemyTankData(actionParams)
+                    this.updateEnemyTankData(actionParams)
                     if (this.tState == TSTATE_SEARCH) {
                         this.tState = TSTATE_FOLLOW;
+                        this.turretFollowing = this.findTankById(actionParams["Id"]);
+
                     }
+                    this.perform();
                 }
                 // Case Bonus : pickups
                 else if( actionParams["Type"] == "HealthPickup"){
@@ -316,14 +321,16 @@ class TankBrain {
     perform(){
         switch(this.tState) {
             case TSTATE_SEARCH: {
-                if (!this.turningLeft) {
-                    this.socket.toggleTurretLeft();
-                    this.turretFollowing = this.findTankById(actionParams["Id"]);
-                }
+                this.socket.toggleTurretLeft();
+                // this.socket.turnTurretToHeading(this.data.heading + 45)
                 break;
             }
             case TSTATE_FOLLOW: {
-                this.socket.turnToHeading();
+                var degree = this.calculator.degreeBetween(this.data.x, this.data.y, this.turretFollowing.x, this.turretFollowing.y)
+                console.log(this.data.turretHeading)
+                console.log(degree)
+                console.log(this.data.x + " " + this.data.y + " " + this.turretFollowing.x + " " + this.turretFollowing.y);
+                this.socket.turnTurretToHeading(degree);
                 break;
             }
         }
