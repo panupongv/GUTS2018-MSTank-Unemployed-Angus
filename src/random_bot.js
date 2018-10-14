@@ -39,6 +39,9 @@ class TankBrain {
         this.snitchHolder = null;
         this.otherTanks = []
 
+        this.moveAroundRoute = [[-20,-50],[-20,50],[20,50],[20,-50]]
+        this.currentCoverPoint = 0;
+
         this.mState = STATE_MOVING_TO_PICKUP;
         this.tState = TSTATE_SEARCH;
 
@@ -111,12 +114,12 @@ class TankBrain {
                         var dis = this.calculator.distance(this.data.x, actionParams["X"], this.data.y, actionParams["Y"]);
                         if (dis < currentDis) {
                             this.trackedPickup = actionParams;
-                            this.trackedRect = this.calculator.getSquarePath(actionParams["X"],
+                            this.trackedRect = this.calculator.squarePath(actionParams["X"],
                                                                              actionParams["Y"], 30);
                         }
                     } else {
                         this.trackedPickup = actionParams;
-                        this.trackedRect = this.calculator.getSquarePath(actionParams["X"],
+                        this.trackedRect = this.calculator.squarePath(actionParams["X"],
                             actionParams["Y"], 30);
                     }
 
@@ -209,8 +212,9 @@ class TankBrain {
     }
 
     perform() {
-        this.action_go_to_nearest_bank()
-        return;
+        // this.action_go_to_nearest_bank()
+        // this.moveAround();
+        // return;
         switch(this.tState) {
             case TSTATE_SEARCH: {
                 this.socket.toggleTurretLeft();
@@ -248,9 +252,8 @@ class TankBrain {
         var myX = this.calculator.currentX();
         var myY = this.calculator.currentY();
         var distance = this.calculator.distance(x, myX, y, myY);
-        if(distance <= 5)
+        if(distance <= 3)
         {
-
             this.socket.stopAll();
             if (this.mState == STATE_REVOLVING) {
                 this.rectIndex++;
@@ -294,6 +297,24 @@ class TankBrain {
 
     action_pick_up_health(x,y){
         this.action_go_to(x,y)
+    }
+
+    moveAround(){
+        var targetPoint = this.moveAroundRoute[this.currentCoverPoint]
+        var distance = this.calculator.distance(targetPoint[0], this.data.x, targetPoint[1], this.data.y)
+
+        console.log(targetPoint)
+        console.log('XXXX' + distance)
+
+        if(distance <= 3){
+            this.currentCoverPoint += 1;
+            this.currentCoverPoint %= this.moveAroundRoute.length
+            this.moveAround();
+            return;
+        }
+
+        // this.action_go_to_nearest_bank();
+        this.action_go_to(targetPoint[0], targetPoint[1])
     }
 
     reflectLeft() {

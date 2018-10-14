@@ -89,8 +89,12 @@ class Calculator {
         return angleDeg
     }
 
-    getSquarePath(x,y,width) {
+    squarePath(x, y, width) {
         return [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+    }
+
+    coverPath(){
+        return [[-20,-50],[-20,50],[20,50],[20,-50]]
     }
 }
 
