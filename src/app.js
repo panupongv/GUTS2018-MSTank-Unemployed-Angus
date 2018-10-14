@@ -2,6 +2,24 @@ var net = require('net');
 const utf8 = require('utf8');
 const TankBrain = require('./random_bot.js');
 
+const TEST = 0
+const CREATETANK = 1
+const DESPAWNTANK = 2
+const FIRE = 3
+const TOGGLEFORWARD = 4
+const TOGGLEREVERSE = 5
+const TOGGLELEFT = 6
+const TOGGLERIGHT = 7
+const TOGGLETURRETLEFT = 8
+const TOGGLETURRETRIGHT = 9
+const TURNTURRETTOHEADING = 10
+const TURNTOHEADING = 11
+const MOVEFORWARDDISTANCE = 12
+const MOVEBACKWARSDISTANCE = 13
+const STOPALL = 14
+const STOPTURN = 15
+const STOPMOVE = 16
+const STOPTURRET = 17
 
 const commands =
 {
