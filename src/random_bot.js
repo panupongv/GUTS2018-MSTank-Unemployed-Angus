@@ -355,14 +355,17 @@ class TankBrain {
     }
 
     action_go_to_left_bank(){
+        this.action_go_to(100,0)
         //todo 17chuchu
     }
 
     action_go_to_right_bank(){
+        this.action_go_to(-100,0)
         //todo 17chuchu
     }
 
     action_go_to_nearest_bank(){
+        
         //todo 17chuchu
     }
 
