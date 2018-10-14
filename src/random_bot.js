@@ -26,11 +26,6 @@ const TSTATE_SEARCH = 200;
 const TSTATE_FOLLOW = 201;
 // const TSTATE_STILL = 202;
 
-const topBound = 70;
-const bottomBound = -70;
-const leftBound = -100;
-const rightBound = 100;
-
 class Point {
     constructor(x, y)
     {
@@ -92,7 +87,7 @@ class TankBrain {
     }
 
     removeOutDateData() {
-        this.otherTanks = this.otherTanks.filter((a) => a.isOutDate());
+        this.otherTanks = this.otherTanks.filter((a) => !a.isOutDate());
     }
 
     removeOutDatePickup() {
@@ -120,6 +115,9 @@ class TankBrain {
                         this.mState = STATE_SCOUT;
 
                     this.perform();
+                }
+                else if (this.data === null){
+                    break;
                 }
                 // Case enemy
                 else if( actionParams["Type"] == "Tank"){
@@ -160,7 +158,7 @@ class TankBrain {
                         }
                         else{
                             var currentPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
-                            var newPickupDist = this.calculator.distanceTo(pickupX, pickupY);
+                            var newPickupDist = this.calculator.distanceTo(pickup.x, pickup.y);
 
                             if(newPickupDist < currentPickupDist) {
                                 this.trackedPickup = pickup;
@@ -262,8 +260,31 @@ class TankBrain {
     }
 
     perform() {
+        //shooting decision
+        var triggered = false
+        for(var i = 0 ; i < this.otherTanks.length ; i++){
+            var enemy = this.otherTanks[i];
+            var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
+            var distance = this.calculator.distanceTo(enemy.x, enemy.y);
+            if(difDegree <= 5 && distance <= 50) {
+                triggered = true
+                break;
+            }
+        }
+
+        if(triggered) {
+            this.socket.fire();
+            // this.socket.fire();
+            // this.socket.fire();
+            console.log("FIRE");
+        }
+
+        // console.log(Date.now()/1000);
         // this.action_go_to_nearest_bank()
         // this.moveAround();
+        // this.socket.fire();
+        // this.socket.moveForward(1000);
+        // this.socket.toggleTurretLeft();
         // return;
         console.log("mSTATE = " + this.mState + ", tSTATE = " + this.tState);
 
@@ -280,6 +301,7 @@ class TankBrain {
                     console.log("cant get heal in STATE_GUARDIAN")
                     this.mState = STATE_SCOUT;
                     this.perform();
+
                     return;
                 }
                 this.moveAroundRoute = this.calculator.squarePath(this.trackedPickup.x, this.trackedPickup.y);
@@ -316,29 +338,48 @@ class TankBrain {
                 break;
             }
         }
+
+        // //shooting decision
+        // var triggered = false
+        // for(var i = 0 ; i < this.otherTanks.length ; i++){
+        //     var enemy = this.otherTanks[i];
+        //     var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
+        //     var distance = this.calculator.distanceTo(enemy.x, enemy.y);
+        //     if(difDegree <= 5 && distance <= 50) {
+        //         triggered = true
+        //         break;
+        //     }
+        // }
+        //
+        // if(triggered) {
+        //     this.socket.fire();
+        //     this.socket.fire();
+        //     this.socket.fire();
+        //     console.log("FIRE");
+        // }
     }
 
-    action_fire_nearest_enemy() {
-        var nearestEnemy = this.calculator.findNearestByType("tank");
-
-        if(nearestEnemy == null) {
-            return;
-        } else {
-            if(Math.abs(this.calculator.degreeBetween(this.mainTank.data.x,this.mainTank.data.y,nearestEnemy.x,nearestEnemy.x) - this.data.turretHeading) < 10 ){
-                this.socket.fire()
-            } else {
-                this.action_look_at(nearestEnemy.x, nearestEnemy.y)
-            }
-            
-        }
-
-        this.socket.fire()
-    }
+    // action_fire_nearest_enemy() {
+    //     var nearestEnemy = this.calculator.findNearestByType("tank");
+    //
+    //     if(nearestEnemy == null) {
+    //         return;
+    //     } else {
+    //         if(Math.abs(this.calculator.degreeBetween(this.mainTank.data.x,this.mainTank.data.y,nearestEnemy.x,nearestEnemy.x) - this.data.turretHeading) < 10 ){
+    //             this.socket.fire()
+    //         } else {
+    //             this.action_look_at(nearestEnemy.x, nearestEnemy.y)
+    //         }
+    //
+    //     }
+    //
+    //     this.socket.fire()
+    // }
 
     action_go_to(x,y) {
         var myX = this.calculator.currentX();
         var myY = this.calculator.currentY();
-        var distance = this.calculator.distance(x, myX, y, myY);
+        var distance = this.calculator.distanceTo(x, y);
         if(distance <= 3)
         {
             this.socket.stopAll();
@@ -346,7 +387,7 @@ class TankBrain {
         }
 
         var degree = this.calculator.degreeBetween(myX, myY, x, y);
-        var difDegree = Math.abs(degree - this.data.heading);
+        var difDegree = this.calculator.diffDegreeAbs(x,y, this.data.heading);
 
         // console.log(myX + '-' + myY);
         // console.log(difDegree);
@@ -357,7 +398,7 @@ class TankBrain {
             return
         }
 
-        this.socket.moveForward(10);
+        this.socket.moveForward(5);
     }
 
     action_go_to_left_bank(){

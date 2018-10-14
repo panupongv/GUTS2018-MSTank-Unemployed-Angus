@@ -90,7 +90,10 @@ class Calculator {
     }
 
     squarePath(x, y, width=40) {
-        var ar =  [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+        // var ar =  [[x-width/2,y-width/x],[x-width/2,y+width/x],[x+width/2,y+width/x],[x+width/2,y-width/x]]
+
+        var ar =  [[x-width/2,y-width/2],[x-width/2,y+width/2],[x+width/2,y+width/2],[x+width/2,y-width/2]];
+
         return this.rotateToNearestFirst(ar);
     }
 
@@ -122,6 +125,12 @@ class Calculator {
 
     distanceTo(x,y){
         return this.distance(x, this.mainTank.data.x, y, this.mainTank.data.y)
+    }
+
+    diffDegreeAbs(x,y, degree){
+        var degree1 = this.degreeBetween(this.mainTank.data.x, this.mainTank.data.y, x, y);
+        var diffDegree = Math.abs(degree1 - degree);
+        return diffDegree;
     }
 }
 

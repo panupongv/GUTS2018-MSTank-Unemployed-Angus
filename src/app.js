@@ -110,7 +110,7 @@ class SocketManager
                 //console.log(type + ' - ' + len + ' - ' + jsonString);
                 if(ref.tb === null)
                     continue;
-                console.log('-' + jsonString);
+                // console.log('-' + jsonString);
                 if(jsonString.length <= 3)
                     continue;
                 ref.tb.think(type,JSON.parse(jsonString))
