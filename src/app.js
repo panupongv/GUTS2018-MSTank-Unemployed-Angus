@@ -215,4 +215,6 @@ class SocketManager
     }
 }
 
-var socket = new SocketManager('127.0.0.1', 8052);
+local = '127.0.0.1';
+tanknet = '192.168.44.109';
+var socket = new SocketManager(tanknet, 8052);
