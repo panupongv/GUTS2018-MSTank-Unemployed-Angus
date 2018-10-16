@@ -1,223 +1,148 @@
-var net = require('net');
-const utf8 = require('utf8');
-//Client to Server
 const Calculator = require('./calculator.js');
 const TankData = require('./tankdata.js');
-//Server to client
 
-const OBJECTUPDATE = 18
-const HEALTHPICKUP = 19
-const AMMOPICKUP = 20
-const SNITCHPICKUP = 21
-const DESTROYED = 22
-const ENTEREDGOAL = 23
-const KILL = 24
-const SNITCHAPPEARED = 25
-const GAMETIMEUPDATE = 26
-const HITDETECTED = 27
-const SUCCESSFULLHIT = 28
+//event types
+const OBJECTUPDATE  = 18;
+const HEALTHPICKUP  = 19;
+const AMMOPICKUP    = 20;
+const SNITCHPICKUP  = 21;
+const DESTROYED     = 22;
+const ENTEREDGOAL   = 23;
+const KILL          = 24;
+const SNITCHAPPEARED = 25;
+const GAMETIMEUPDATE = 26;
+const HITDETECTED   = 27;
+const SUCCESSFULLHIT = 28;
 
-const TSTATE_SEARCH = 200;
-const TSTATE_FOLLOW = 201;
-// const TSTATE_STILL = 202;
+const eventTypString = {
+    OBJECTUPDATE    :"Object Update",
+    HEALTHPICKUP    :"Health Pickup",
+    AMMOPICKUP      :"Ammo Pickup",
+    SNITCHPICKUP    :"Snitch Pickup",
+    DESTROYED       :"Destroyed",
+    ENTEREDGOAL     :"Entered Goal",
+    KILL            :"Kill",
+    SNITCHAPPEARED  :"Snitch Appeared",
+    GAMETIMEUPDATE  :"Game Time Update",
+    HITDETECTED     :"Hit Detected",
+    SUCCESSFULLHIT  :"Successful Hit"
+};
 
-class Point {
-    constructor(x, y)
-    {
-        this.x =x
-        this.y = y
-    }
-}
+const PERFORM_RATE_INTERVAL = 100;
+
 class TankBrain {
     constructor(name, socket) {
-        console.log('construst started')
         this.name = name;
-        this.socket = socket;
-
-        this.data = null;
-        this.gameTime = null;
-
-        this.snitching = false;
-
+        this.motor = socket;
         this.calculator = new Calculator(this);
+        this.lastPerformTime = Date.now();
 
-        this.currentStyle = 0;
-
-        this.startTime = Date.now();
-
-        this.startMoving = false
-        console.log('construct ended')
+        this.data = null; // will be fetch later
     }
 
-    updateSelfTankData(actionParams) {
-        this.data = new TankData(actionParams)
+    updateSelfTankData(tankValues) {
+        this.data = new TankData(tankValues)
     }
 
-    fetchEnvironmentData(actionType, actionParams){
-        switch(actionType) {
+    readyToPerform() {
+        return this.data != null
+    }
+
+    messageIsFlooding() {
+        return Date.now() - this.lastPerformTime < PERFORM_RATE_INTERVAL;
+    }
+
+    updateLastPerformTime() {
+        this.lastPerformTime = Date.now();
+    }
+
+    fetchEnvironmentData(dataType, values){
+        switch(dataType) {
             case OBJECTUPDATE: {
-                // Case self
-                if( this.name == actionParams["Name"]){
-                    this.updateSelfTankData(actionParams);
-                    // if(this.removeOutDatePickup())
-                    //     this.mState = STATE_SCOUT;
-
-                    this.perform();
-                }
-                else if (this.data === null){
-                    break;
-                }
-                // Case enemy
-                else if( actionParams["Type"] == "Tank"){
-                    // if (this.tState == TSTATE_SEARCH) {
-                        // this.tState = TSTATE_FOLLOW;
-                        // var enemy = this.findTankById(actionParams["Id"]);
-                        // this.turretFollowing = new Point(enemy.x, enemy.y);
-                    // }
-
-                    //shooting decision
-                        var enemy = new TankData(actionParams);// this.otherTanks[i];
-                        var difDegree = this.calculator.diffDegreeAbs(enemy.x, enemy.y, this.data.turretHeading);
-                        var distance = this.calculator.distanceTo(enemy.x, enemy.y);
-                        if(difDegree <= 5 && distance <= 60) {
-                            this.socket.fire();
-                        }
-
-
-                }
-
+                if(values["Type"] == "Tank" && values["Name"] == this.name)
+                    this.updateSelfTankData(values)
                 break;
             } 
 
-            case SNITCHPICKUP: {
-                /*
-                    Id: int
-                */
-                if(actionParams["Id"] == this.data.id)
-                    this.snitching = true;
-                break;
-            }
-            case DESTROYED: {
-                this.startMoving = false;
+            case HEALTHPICKUP: {
                 break;
             }
 
-            case KILL: {
-                this.action_go_to_nearest_bank();
+            case AMMOPICKUP: {
+                break;
+            }
+
+            case SNITCHPICKUP: {
+                break;
+            }
+            case DESTROYED: {
                 break;
             }
 
             case ENTEREDGOAL: {
-                this.killStack = 0;
                 break;
             }
 
+            case KILL: {
+                break;
+            }
+
+            case SNITCHAPPEARED: {
+                break;
+            }
+
+            case GAMETIMEUPDATE: {
+                break;
+            }
+
+            case HITDETECTED: {
+                break;
+            }
+
+            case SUCCESSFULLHIT: {
+                break;
+            }
         } 
     }
 
     perform() {
-        if(Math.random() < 0.1)
-            this.socket.toggleForward();
-        // if(this.startMoving == false){
-        //     this.startMoving = true;
-        // }
-        if(this.snitching)
-        {
-            this.action_go_to_nearest_bank();
+        if(this.readyToPerform())
             return;
-        }
-        else
+
+        if(this.messageIsFlooding())
+            return;
+
+        this.updateLastPerformTime();
+
+        /* your code now */
+        // note : only 1 action should be perform to maintain 10 message/sec discipline
+        var randomA = this.calculator.randomInt(1,15); // random [1,15]
+
+        if(randomA == 1)
         {
-            var randNum = Math.floor(Math.random()*100)
-            if(randNum <= 20)
-            {
-                var newStyle = Math.floor(Math.random()*3);
-                if(newStyle != this.currentStyle)
-                {
-                    this.currentStyle = newStyle;
-                    switch (this.currentStyle) {
-                        case 0:
-                            this.socket.toggleTurnLeft();
-                            break;
-                        case 1:
-                            this.socket.toggleTurnRight();
-                            break;
-                        case 2:
-                            this.socket.stopTurn();
-                            break;
-                    }
-                }
+            var randomB = this.calculator.randomInt(0,13);
+            switch (randomB) {
+                case 0: this.motor.toggleForward(); break;
+                case 1: this.motor.toggleBackward(); break;
+                case 2: this.motor.toggleTurnLeft(); break;
+                case 3: this.motor.toggleTurnRight(); break;
+                case 4: this.motor.toggleTurretLeft(); break;
+                case 5: this.motor.toggleTurretRight(); break;
+                case 6: this.motor.fire(); break;
+                case 7: this.motor.turnBodyToHeading(0); break;
+                case 8: this.motor.turnTurretToHeading(90); break;
+                case 9: this.motor.stopAll(); break;
+                case 10: this.motor.stopMove(); break;
+                case 11: this.motor.stopTurn(); break;
+                case 12: this.motor.stopTurret(); break;
+                case 13: this.motor.despawnTank(); break;
             }
         }
-        return;
     }
 
-    action_go_to(x,y) {
-        var myX = this.calculator.currentX();
-        var myY = this.calculator.currentY();
-        var distance = this.calculator.distanceTo(x, y);
-        if(distance <= 3)
-        {
-            this.socket.stopAll();
-            return;
-        }
-
-        var degree = this.calculator.degreeBetween(myX, myY, x, y);
-        var difDegree = this.calculator.diffDegreeAbs(x,y, this.data.heading);
-
-        // console.log(myX + '-' + myY);
-        // console.log(difDegree);
-
-        if(difDegree > 1)// > -0.01 && degree < 0.01)
-        {
-            this.socket.turnToHeading(degree);
-            return
-        }
-
-        this.socket.moveForward(10);
-    }
-
-    action_go_to_left_bank(){
-        this.action_go_to(0, 105)
-    }
-
-    action_go_to_right_bank(){
-        this.action_go_to(0, -105)
-    }
-
-    action_go_to_nearest_bank(){
-        if (this.data.y >= 0) {
-
-            this.action_go_to_left_bank();
-        } else {
-            this.action_go_to_right_bank();
-        }
-    }
-
-    action_pick_up_health(x,y){
-        this.action_go_to(x,y)
-    }
-
-    moveAround(){
-        var targetPoint = this.moveAroundRoute[this.currentCoverPoint]
-        var distance = this.calculator.distance(targetPoint[0], this.data.x, targetPoint[1], this.data.y)
-
-        console.log(targetPoint)
-        console.log('XXXX' + distance)
-
-        if(distance <= 2){
-            this.currentCoverPoint += 1;
-            this.currentCoverPoint %= this.moveAroundRoute.length
-            this.moveAround();
-            return;
-        }
-
-        // this.action_go_to_nearest_bank();
-        this.action_go_to(targetPoint[0], targetPoint[1])
-    }
-
-    think(actionType, actionParams) {
-        this.fetchEnvironmentData(actionType, actionParams);
+    think(dataType, values) {
+        this.fetchEnvironmentData(dataType, values);
+        this.perform();
     }
 }
 

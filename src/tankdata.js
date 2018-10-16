@@ -1,23 +1,25 @@
+const OUTDATE_MS = 2000;
+
 class TankData {
-    constructor(actionParams) {
-        this.updateData(actionParams);
+    constructor(tankValues) {
+        this.updateData(tankValues);
     }
 
-    updateData(actionParams) {
-        this.x = actionParams["X"];
-        this.y = actionParams["Y"];
-        this.id = actionParams["Id"];
-        this.name = actionParams["Name"];
-        this.type = actionParams["Type"];
-        this.heading = actionParams["Heading"];
-        this.turretHeading = actionParams["TurretHeading"];
-        this.health = actionParams["Health"];
-        this.ammo = actionParams["Ammo"];
+    updateData(tankValues) {
+        this.x = tankValues["X"];
+        this.y = tankValues["Y"];
+        this.id = tankValues["Id"];
+        this.name = tankValues["Name"];
+        this.type = tankValues["Type"];
+        this.heading = tankValues["Heading"];
+        this.turretHeading = tankValues["TurretHeading"];
+        this.health = tankValues["Health"];
+        this.ammo = tankValues["Ammo"];
         this.updateTime = Date.now();
     }
 
     isOutDate(){
-        return (Date.now() - this.updateTime) >= 2000;
+        return (Date.now() - this.updateTime) >= OUTDATE_MS;
     }
 }
 
