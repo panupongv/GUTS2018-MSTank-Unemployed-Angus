@@ -29,7 +29,6 @@ const eventTypString = {
 };
 
 const PERFORM_RATE_INTERVAL = 100;
-
 class TankBrain {
     constructor(name, socket) {
         this.name = name;
@@ -38,31 +37,32 @@ class TankBrain {
         this.lastPerformTime = Date.now();
 
         this.data = null; // will be fetch later
+        setInterval(this.thinkAndPerform.bind(this), PERFORM_RATE_INTERVAL);
     }
 
     updateSelfTankData(tankValues) {
-        this.data = new TankData(tankValues)
+        this.data = new TankData(tankValues);
     }
 
-    readyToPerform() {
-        return this.data != null
+    notReadyToPerform() {
+        return this.data === null;
     }
 
     messageIsFlooding() {
-        return Date.now() - this.lastPerformTime < PERFORM_RATE_INTERVAL;
+        return (Date.now() - this.lastPerformTime) < PERFORM_RATE_INTERVAL;
     }
 
     updateLastPerformTime() {
         this.lastPerformTime = Date.now();
     }
 
-    fetchEnvironmentData(dataType, values){
+    memorise(dataType, values) {
         switch(dataType) {
             case OBJECTUPDATE: {
                 if(values["Type"] == "Tank" && values["Name"] == this.name)
-                    this.updateSelfTankData(values)
+                    this.updateSelfTankData(values);
                 break;
-            } 
+            }
 
             case HEALTHPICKUP: {
                 break;
@@ -102,25 +102,23 @@ class TankBrain {
             case SUCCESSFULLHIT: {
                 break;
             }
-        } 
+        }
     }
 
-    perform() {
-        if(this.readyToPerform())
+    thinkAndPerform() {
+        if(this.notReadyToPerform())
             return;
-
         if(this.messageIsFlooding())
             return;
-
         this.updateLastPerformTime();
 
         /* your code now */
-        // note : only 1 action should be perform to maintain 10 message/sec discipline
-        var randomA = this.calculator.randomInt(1,15); // random [1,15]
+        // note : only 1 action should be thinkAndPerform to maintain 10 message/sec discipline
+        var randomA = this.calculator.randomInt(1,4); // random [1,15]
 
         if(randomA == 1)
         {
-            var randomB = this.calculator.randomInt(0,13);
+            var randomB = this.calculator.randomInt(0,12);
             switch (randomB) {
                 case 0: this.motor.toggleForward(); break;
                 case 1: this.motor.toggleBackward(); break;
@@ -135,14 +133,8 @@ class TankBrain {
                 case 10: this.motor.stopMove(); break;
                 case 11: this.motor.stopTurn(); break;
                 case 12: this.motor.stopTurret(); break;
-                case 13: this.motor.despawnTank(); break;
             }
         }
-    }
-
-    think(dataType, values) {
-        this.fetchEnvironmentData(dataType, values);
-        this.perform();
     }
 }
 

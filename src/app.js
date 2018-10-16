@@ -36,16 +36,11 @@ class TankRemote
 
         let thisRef = this;
         console.log("Attempt to connect to http://" + hostname + ":" + port);
-        this.client.connect(port, hostname, ()=>{
-            console.log('Successfully connected to http://' + thisRef.hostname + ':' + thisRef.port);
-
-            var cmd = '{"Name":"' + thisRef.tankName + '"}';
-            var uia = new Uint8Array([commands.createTank, cmd.length+1]);
-            thisRef.client.write(uia);
-            thisRef.client.write(utf8.encode(cmd));
-
-            this.tankBrain = new TankBrain(thisRef.tankName, thisRef);
-        });
+        this.client.connect(port, hostname, (()=>{
+            console.log('Successfully connected to http://' + this.hostname + ':' + this.port);
+            this.createTank(this.tankName);
+            this.tankBrain = new TankBrain(this.tankName, this);
+        }).bind(this));
 
         this.client.on('data', function(data) {
             const bytes = Uint8Array.from(data);
@@ -65,7 +60,7 @@ class TankRemote
                 if(jsonString.length <= 3)
                     continue;
 
-                thisRef.tankBrain.think(type,JSON.parse(jsonString))
+                thisRef.tankBrain.memorise(type,JSON.parse(jsonString));
                 console.log(jsonString);
             }
         });
@@ -75,16 +70,16 @@ class TankRemote
         });
     }
 
-    createTank(socket, name){
+    createTank(name){
         var cmd = '{"Name":"' + name + '"}';
         var uia = new Uint8Array([commands.createTank, cmd.length+1]);
-        socket.write(uia);
-        socket.write(utf8.encode(cmd));
+        this.client.write(uia);
+        this.client.write(utf8.encode(cmd));
     }
 
     despawnTank() {
         var uia = new Uint8Array([commands.despawnTank, 0]);
-        this.client.write(packet);
+        this.client.write(uia);
     }
 
     fire() {
