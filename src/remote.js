@@ -3,24 +3,24 @@ const utf8 = require('utf8');
 
 const commands =
 {
-    test: 0,
-    createTank: 1,
-    despawnTank: 2,
-    fire: 3,
-    toggleForward: 4,
-    toggleReverse:  5,
-    toggleLeft: 6,
-    toggleRight: 7,
-    toggleTurretLeft: 8,
-    toggleTurretRight: 9,
-    turnTurretToHeading: 10,
-    turnToHeading: 11,
-    moveForwardDistance: 12,
-    moveBackwardsDistance: 13,
-    stopAll: 14,
-    stopTurn: 15,
-    stopMove: 16,
-    stopTurret: 17,
+    TEST: 0,
+    CREATE_TANK: 1,
+    DESPAWN_TANK: 2,
+    FIRE: 3,
+    TOGGLE_FORWARD: 4,
+    TOGGLE_REVERSE:  5,
+    TOGGLE_LEFT: 6,
+    TOGGLE_RIGHT: 7,
+    TOGGLE_TURRET_LEFT: 8,
+    TOGGLE_TURRET_RIGHT: 9,
+    TURN_TURRET_TO_HEADING: 10,
+    TURN_TO_HEADING: 11,
+    MOVE_FORWARD_DISTANCE: 12,
+    MOVE_BACKWARD_DISTANCE: 13,
+    STOP_ALL: 14,
+    STOP_TURN: 15,
+    STOP_MOVE: 16,
+    STOP_TURRET: 17,
 };
 
 class TankRemote
@@ -59,7 +59,7 @@ class TankRemote
                     continue;
 
                 this.tankBrain.memorise(type,JSON.parse(jsonString));
-                console.log(jsonString);
+                // console.log(jsonString);
             }
         }).bind(this));
 
@@ -74,98 +74,98 @@ class TankRemote
 
     createTank(name){
         var cmd = '{"Name":"' + name + '"}';
-        var uia = new Uint8Array([commands.createTank, cmd.length+1]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.CREATE_TANK, cmd.length+1]);
+        this.socket.write(header);
         this.socket.write(utf8.encode(cmd));
     }
 
     despawnTank() {
-        var uia = new Uint8Array([commands.despawnTank, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.DESPAWN_TANK, 0]);
+        this.socket.write(header);
     }
 
     fire() {
-        var uia = new Uint8Array([commands.fire, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.FIRE, 0]);
+        this.socket.write(header);
     }
 
     toggleForward() {
-        var uia = new Uint8Array([commands.toggleForward, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_FORWARD, 0]);
+        this.socket.write(header);
     }
 
     toggleBackward() {
-        var uia = new Uint8Array([commands.toggleReverse, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_REVERSE, 0]);
+        this.socket.write(header);
     }
 
     toggleTurnLeft() {
-        var uia = new Uint8Array([commands.toggleLeft, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_LEFT, 0]);
+        this.socket.write(header);
     }
 
     toggleTurnRight() {
-        var uia = new Uint8Array([commands.toggleRight, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_RIGHT, 0]);
+        this.socket.write(header);
     }
 
     toggleTurretLeft() {
-        var uia = new Uint8Array([commands.toggleTurretLeft, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_TURRET_LEFT, 0]);
+        this.socket.write(header);
     }
 
     toggleTurretRight() {
-        var uia = new Uint8Array([commands.toggleTurretRight, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TOGGLE_TURRET_RIGHT, 0]);
+        this.socket.write(header);
     }
 
     turnTurretToHeading(amount) {
         var cmd = '{ "Amount" : ' + amount + ' }';
-        var uia = new Uint8Array([commands.turnTurretToHeading, cmd.length+1]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TURN_TURRET_TO_HEADING, cmd.length+1]);
+        this.socket.write(header);
         this.socket.write(utf8.encode(cmd));
     }
 
     turnBodyToHeading(amount) {
         var cmd = '{ "Amount" : ' + amount + ' }';
-        var uia = new Uint8Array([commands.turnToHeading, cmd.length+1]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.TURN_TO_HEADING, cmd.length+1]);
+        this.socket.write(header);
         this.socket.write(utf8.encode(cmd));
     }
 
     moveForward(amount)
     {
         var cmd = '{ "Amount" : ' + amount + ' }';
-        var uia = new Uint8Array([commands.moveForwardDistance, cmd.length+1]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.MOVE_FORWARD_DISTANCE, cmd.length+1]);
+        this.socket.write(header);
         this.socket.write(utf8.encode(cmd));
     }
 
     moveBackward(amount) {
         var cmd = '{ "Amount" : ' + amount + ' }';
-        var uia = new Uint8Array([commands.moveBackwardsDistance, cmd.length+1]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.MOVE_BACKWARD_DISTANCE, cmd.length+1]);
+        this.socket.write(header);
         this.socket.write(utf8.encode(cmd));
     }
 
     stopAll() {
-        var uia = new Uint8Array([commands.stopAll, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.STOP_ALL, 0]);
+        this.socket.write(header);
     }
 
     stopTurn() {
-        var uia = new Uint8Array([commands.stopTurn, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.STOP_TURN, 0]);
+        this.socket.write(header);
     }
 
     stopMove() {
-        var uia = new Uint8Array([commands.stopMove, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.STOP_MOVE, 0]);
+        this.socket.write(header);
     }
 
     stopTurret() {
-        var uia = new Uint8Array([commands.stopTurret, 0]);
-        this.socket.write(uia);
+        var header = new Uint8Array([commands.STOP_TURRET, 0]);
+        this.socket.write(header);
     }
 }
 

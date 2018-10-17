@@ -1,6 +1,6 @@
-const Bot = require('./bot.js');
+const TankBot = require('./bot.js');
 
 let port = 8052;
 let host = 'localhost';
 let tankName ='UnemployedAngus';
-new Bot(host, port, tankName);
+new TankBot(host, port, tankName);

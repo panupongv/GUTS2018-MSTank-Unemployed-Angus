@@ -1,40 +1,41 @@
 const Calculator = require('./calculator.js');
 const TankData = require('./data.js');
-const TankRemote = require('./remote.js');
 
-//event types
-const OBJECTUPDATE  = 18;
-const HEALTHPICKUP  = 19;
-const AMMOPICKUP    = 20;
-const SNITCHPICKUP  = 21;
-const DESTROYED     = 22;
-const ENTEREDGOAL   = 23;
-const KILL          = 24;
-const SNITCHAPPEARED = 25;
-const GAMETIMEUPDATE = 26;
-const HITDETECTED   = 27;
-const SUCCESSFULLHIT = 28;
+const events = {
+    OBJECT_UPDATE  : 18,
+    HEALTH_PICKUP  : 19,
+    AMMO_PICKUP    : 20,
+    SNITCH_PICKUP  : 21,
+    DESTROYED     : 22,
+    ENTERED_GOAL   : 23,
+    KILL          : 24,
+    SNITCH_APPEARED : 25,
+    GAME_TIME_UPDATE : 26,
+    HIT_DETECTED   : 27,
+    SUCCESSFULL_HIT : 28
+};
 
-const eventTypString = {
-    OBJECTUPDATE    :"Object Update",
-    HEALTHPICKUP    :"Health Pickup",
-    AMMOPICKUP      :"Ammo Pickup",
-    SNITCHPICKUP    :"Snitch Pickup",
-    DESTROYED       :"Destroyed",
-    ENTEREDGOAL     :"Entered Goal",
-    KILL            :"Kill",
-    SNITCHAPPEARED  :"Snitch Appeared",
-    GAMETIMEUPDATE  :"Game Time Update",
-    HITDETECTED     :"Hit Detected",
-    SUCCESSFULLHIT  :"Successful Hit"
+const eventString = {
+    18      :"Object Update",
+    19      :"Health Pickup",
+    20      :"Ammo Pickup",
+    21      :"Snitch Pickup",
+    22      :"Destroyed",
+    23      :"Entered Goal",
+    24      :"Kill",
+    25      :"Snitch Appeared",
+    26      :"Game Time Update",
+    27      :"Hit Detected",
+    28      :"Successful Hit"
 };
 
 const PERFORM_RATE_INTERVAL = 100;
+
 class TankBrain {
     constructor(name, remote) {
         this.name = name;
         this.lastPerformTime = Date.now();
-        this.data = null; // will be fetch later
+        this.data = null; // will fetch later
 
         this.calculator = new Calculator(this);
         this.control = remote;
@@ -59,50 +60,54 @@ class TankBrain {
         this.lastPerformTime = Date.now();
     }
 
-    memorise(dataType, values) {
-        switch(dataType) {
-            case OBJECTUPDATE: {
+    memorise(eventType, values) {
+        console.log("event " + eventString[eventType] + " received");
+        console.log(values);
+        console.log();
+
+        switch(eventType) {
+            case events.OBJECT_UPDATE: {
                 if(values["Type"] == "Tank" && values["Name"] == this.name)
                     this.updateSelfTankData(values);
                 break;
             }
 
-            case HEALTHPICKUP: {
+            case events.HEALTH_PICKUP: {
                 break;
             }
 
-            case AMMOPICKUP: {
+            case events.AMMO_PICKUP: {
                 break;
             }
 
-            case SNITCHPICKUP: {
+            case events.SNITCH_PICKUP: {
                 break;
             }
-            case DESTROYED: {
-                break;
-            }
-
-            case ENTEREDGOAL: {
+            case events.DESTROYED: {
                 break;
             }
 
-            case KILL: {
+            case events.ENTERED_GOAL: {
                 break;
             }
 
-            case SNITCHAPPEARED: {
+            case events.KILL: {
                 break;
             }
 
-            case GAMETIMEUPDATE: {
+            case events.SNITCH_APPEARED: {
                 break;
             }
 
-            case HITDETECTED: {
+            case events.GAME_TIME_UPDATE: {
                 break;
             }
 
-            case SUCCESSFULLHIT: {
+            case events.HIT_DETECTED: {
+                break;
+            }
+
+            case events.SUCCESSFULL_HIT: {
                 break;
             }
         }
