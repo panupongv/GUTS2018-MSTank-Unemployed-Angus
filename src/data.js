@@ -1,6 +1,6 @@
 const OUTDATE_MS = 2000;
 
-class TankData {
+class Data {
     constructor(tankValues) {
         this.updateData(tankValues);
     }
@@ -23,4 +23,4 @@ class TankData {
     }
 }
 
-module.exports = TankData;
+module.exports = Data;

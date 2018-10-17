@@ -1,5 +1,6 @@
 const Calculator = require('./calculator.js');
-const TankData = require('./tankdata.js');
+const TankData = require('./data.js');
+const TankRemote = require('./remote.js');
 
 //event types
 const OBJECTUPDATE  = 18;
@@ -30,13 +31,15 @@ const eventTypString = {
 
 const PERFORM_RATE_INTERVAL = 100;
 class TankBrain {
-    constructor(name, socket) {
+    constructor(name, remote) {
         this.name = name;
-        this.motor = socket;
-        this.calculator = new Calculator(this);
         this.lastPerformTime = Date.now();
-
         this.data = null; // will be fetch later
+
+        this.calculator = new Calculator(this);
+        this.control = remote;
+        this.control.setTarget(this);
+
         setInterval(this.thinkAndPerform.bind(this), PERFORM_RATE_INTERVAL);
     }
 
@@ -45,7 +48,7 @@ class TankBrain {
     }
 
     notReadyToPerform() {
-        return this.data === null;
+        return this.data === null || this.control === null;
     }
 
     messageIsFlooding() {
@@ -120,19 +123,19 @@ class TankBrain {
         {
             var randomB = this.calculator.randomInt(0,12);
             switch (randomB) {
-                case 0: this.motor.toggleForward(); break;
-                case 1: this.motor.toggleBackward(); break;
-                case 2: this.motor.toggleTurnLeft(); break;
-                case 3: this.motor.toggleTurnRight(); break;
-                case 4: this.motor.toggleTurretLeft(); break;
-                case 5: this.motor.toggleTurretRight(); break;
-                case 6: this.motor.fire(); break;
-                case 7: this.motor.turnBodyToHeading(0); break;
-                case 8: this.motor.turnTurretToHeading(90); break;
-                case 9: this.motor.stopAll(); break;
-                case 10: this.motor.stopMove(); break;
-                case 11: this.motor.stopTurn(); break;
-                case 12: this.motor.stopTurret(); break;
+                case 0: this.control.toggleForward(); break;
+                case 1: this.control.toggleBackward(); break;
+                case 2: this.control.toggleTurnLeft(); break;
+                case 3: this.control.toggleTurnRight(); break;
+                case 4: this.control.toggleTurretLeft(); break;
+                case 5: this.control.toggleTurretRight(); break;
+                case 6: this.control.fire(); break;
+                case 7: this.control.turnBodyToHeading(0); break;
+                case 8: this.control.turnTurretToHeading(90); break;
+                case 9: this.control.stopAll(); break;
+                case 10: this.control.stopMove(); break;
+                case 11: this.control.stopTurn(); break;
+                case 12: this.control.stopTurret(); break;
             }
         }
     }
